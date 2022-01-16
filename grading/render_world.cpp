@@ -3,7 +3,7 @@
 #include "object.h"
 #include "light.h"
 #include "ray.h"
-
+#include "limits.h"
 extern bool disable_hierarchy;
 
 Render_World::Render_World()
@@ -22,15 +22,28 @@ Render_World::~Render_World()
 // to ensure that hit.dist>=small_t.
 Hit Render_World::Closest_Intersection(const Ray& ray)
 {
-    TODO;
-    return {};
+    //TODO; IN PROGRESS
+    double min_t = 500000;
+    Hit bestHit;
+    for(unsigned i = 0; i < objects.size(); i++){
+	Hit temp = objects[i]->Intersection(ray,-1);
+	if(temp.dist < min_t){
+	  bestHit = temp;
+	  min_t = temp.dist;	
+	}
+	}  
+    return bestHit;
 }
 
 // set up the initial view ray and call
 void Render_World::Render_Pixel(const ivec2& pixel_index)
 {
-    TODO; // set up the initial view ray here
+   // TODO; // set up the initial view ray here in PROGRESS
     Ray ray;
+    ray.endpoint = camera.position;
+    vec3 direc = camera.World_Position(pixel_index);
+    ray.direction = direc.normalized();
+     
     vec3 color=Cast_Ray(ray,1);
     camera.Set_Pixel(pixel_index,Pixel_Color(color));
 }
@@ -50,7 +63,17 @@ void Render_World::Render()
 vec3 Render_World::Cast_Ray(const Ray& ray,int recursion_depth)
 {
     vec3 color;
-    TODO; // determine the color here
+  //  TODO; // determine the color here IN PROGRESS
+     Hit cInter =  Closest_Intersection(ray);
+      if(cInter.dist == -1){
+	vec3 def(1,1,1);
+	color = this->background_shader->Shade_Surface(ray,def,def,-1);
+	}    
+	else{
+	vec3 interPoint = ray.Point(cInter.dist);
+	color = cInter.object->material_shader->Shade_Surface(ray,interPoint, cInter.object->Normal(interPoint,-1), recursion_depth); //FIX
+	} 
+	
     return color;
 }
 
