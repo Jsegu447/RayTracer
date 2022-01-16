@@ -9,21 +9,21 @@
 Hit Plane::Intersection(const Ray& ray, int part) const
 {
     //TODO; IN PROGRESS
-    vec3 xe = ray.endpoint - this->x1;
+    vec3 xe =  this->x1 - ray.endpoint;
     double t;
     Hit inter;
     if(dot(this->normal,ray.direction) != 0){
 	t = dot(this->normal, xe)/ dot(this->normal,ray.direction);
-	
+
 	inter.object = this;
 	inter.dist = t;
-	inter.part = -1;
-	}   
+	inter.part = part;
+	}
 
-	else{
-		inter.object = nullptr;
-		inter.dist = -1;
-		inter.part = -1;
+    else{
+	inter.object = nullptr;
+	inter.dist = 0;
+	inter.part = part;
 	}
     return inter;
 }

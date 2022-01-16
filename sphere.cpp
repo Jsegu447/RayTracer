@@ -7,7 +7,7 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
     //TODO; IN PROGRESS
     Hit inter;
 
-    vec3 ec = ray.endpoint - this->center;
+    vec3 ec = this->center - ray.endpoint;
     double b = 2 * dot(ec,ray.direction);
     double c = dot(ec,ec) - (this->radius*this->radius);
     double t;
@@ -15,14 +15,14 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
 	double temp = -1*b + ((b*b) - (4*c));
 	t = temp / 2;
 	inter.object = this;
-	inter.part = -1;
+	inter.part = part;
 	inter.dist = t;
 	}
 
     else{
 	inter.object = nullptr;
-	inter.part = -1;
-	inter.dist = -1;
+	inter.part = 0;
+	inter.dist = part;
 
 	}
 
