@@ -11,13 +11,22 @@ Hit Sphere::Intersection(const Ray& ray, int part) const
     double b = 2 * dot(ec,ray.direction);
     double c = dot(ec,ec) - (this->radius*this->radius);
     double t;
-    if( (b * b) - (4 * c) >= 0 ){
+    if( (b * b) - (4 * c) > 0 ){
 	double temp = -1*b - sqrt(((b*b) - (4*c)));
 	t = temp / 2;
-	inter.object = this;
-	inter.part = part;
-	inter.dist = t;
+	if(t > 0){
+		inter.object = this;
+		inter.dist = t;
+		inter.part = part;
 	}
+	else{
+		temp = -1*b + sqrt(((b*b) - (4*c)));
+		t = temp/2;
+		inter.object = this;
+		inter.dist = t;
+		inter.part = part;
+	}
+}
 
     else{
 	inter.object = nullptr;
