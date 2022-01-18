@@ -45,7 +45,7 @@ void Render_World::Render_Pixel(const ivec2& pixel_index)
    // TODO; // set up the initial view ray here in PROGRESS
     Ray ray;
     ray.endpoint = camera.position;
-    vec3 direc = camera.World_Position(pixel_index);
+    vec3 direc = camera.World_Position(pixel_index) - camera.position;
     ray.direction = direc.normalized();
      
     vec3 color=Cast_Ray(ray,1);
