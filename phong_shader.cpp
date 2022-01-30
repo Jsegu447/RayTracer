@@ -18,7 +18,7 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 	Light.endpoint = intersection_point; //Light ray created
 
 	if(world.enable_shadows == false || world.Closest_Intersection(Light).object == nullptr){
-
+//DONT FORGET TO FIX FOR LAST POINT 
 	color += color_diffuse * std::max(dot(Light.direction,normal),0.0) * world.lights[i]->Emitted_Light(l); // L_d*R_d*max(n dot l,0) or Diffuse portion
 //EMIITED LIGHT NEEDS DISTANCE ********
 	
