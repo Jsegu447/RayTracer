@@ -16,8 +16,8 @@ Shade_Surface(const Ray& ray,const vec3& intersection_point,
 	Ray Light;
 	Light.direction = l.normalized();
 	Light.endpoint = intersection_point; //Light ray created
-	Hit ob = world.Colosests_Intersection(Light);
-	vec3 location = Light.Point(ob.dist) - intersectio_point;
+	Hit ob = world.Closest_Intersection(Light);
+	vec3 location = Light.Point(ob.dist) - intersection_point;
 	if(world.enable_shadows == false || world.Closest_Intersection(Light).object == nullptr || location.magnitude() > l.magnitude() ){
 //DONT FORGET TO FIX FOR LAST POINT 
 	color += color_diffuse * std::max(dot(Light.direction,normal),0.0) * world.lights[i]->Emitted_Light(l); // L_d*R_d*max(n dot l,0) or Diffuse portion
