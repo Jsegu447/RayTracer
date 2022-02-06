@@ -42,7 +42,19 @@ void Mesh::Read_Obj(const char* file)
 // Check for an intersection against the ray.  See the base class for details.
 Hit Mesh::Intersection(const Ray& ray, int part) const
 {
-              
+
+  double dist = 0;
+  Hit inter;
+  inter.object = nullptr;
+  for(unsigned i = 0; i < triangles.size(); i++){
+    if(Intersect_Triangle(ray,i,dist)){
+      inter.object = this;
+      inter.dist = dist;
+      inter.part = i;
+
+      }
+  }
+ 
     
     return inter;
 }
@@ -73,16 +85,30 @@ vec3 Mesh::Normal(const vec3& point, int part) const
 // two triangles.
 bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
 {
-    TODO;
+ 
     vec3 A = vertices[triangles[tri][0]];
     vec3 B = vertices[triangles[tri][1]];
     vec3 C = vertices[triangles[tri][2]];
-    std::cout << "A1: " << A[0] << " A2: " << A[1] << " A3: " << A[2] << std::endl;
-    std::cout << "B1: " << B[0] << " B2: " << B[1] << " B3: " << B[2] << std::endl;
-    std::cout << "C1: " << C[0] << " C2: " << C[1] << " C3: " << C[2] << std::endl;
     vec3 norm = cross( (B-A), (C-A));
     norm = norm.normalized();
-    double t;
+    double t = (dot( (B-ray.endpoint),norm))/ dot(ray.direction,norm);
+    // std::cout << t << std::endl;
+    if(t > small_t){
+      vec3 p = ray.Point(t);
+      double area = 0.5*dot(cross( (B-A), (C-A)),norm);
+      double area_a = 0.5*dot(cross( (B-p), (C-p)),norm);
+      double area_b = 0.5*dot(cross( (p-A), (C-A)),norm);
+      double area_c = 0.5*dot(cross( (B-A), (p-A)),norm);
+      double alpha = area_a/area; 
+      double beta = area_b/area;
+      double gamma = area_c/area;
+      // std::cout<< alpha << " " << beta << " " << gamma << std::endl;
+      if(alpha > -1.0*weight_tolerance && beta > -1.0 * weight_tolerance && gamma > -1.0 * weight_tolerance){
+	dist = t;
+	return true;
+      }
+    }
+
     return false;
 }
 

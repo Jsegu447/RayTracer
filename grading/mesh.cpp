@@ -42,34 +42,27 @@ void Mesh::Read_Obj(const char* file)
 // Check for an intersection against the ray.  See the base class for details.
 Hit Mesh::Intersection(const Ray& ray, int part) const
 {
-    TODO;
-    Hit inter;
-    double dist = 0;
-    if(part >= 0){
-	if(Intersect_Triangle(ray,part,dist)){
-		inter.object = this;
-		inter.part = part;
-		inter.dist = dist;	
-	}
-	else{
-		inter.object = nullptr;
-	}
 
-    }
-    else{
-	for(unsigned i = 0 ; i < triangles.size(); i++){
-		if(Intersect_Triangle(ray,part,dist)){
-		  inter.object = this;
-                  inter.part = part;
-                  inter.dist = dist;
-		}
-		else{
-			inter.object = nullptr;
+  double dist = 0;
+  Hit inter;
+  inter.object = nullptr;
+  if(part < 0){
+  for(unsigned i = 0; i < triangles.size(); i++){
+    if(Intersect_Triangle(ray,i,dist)){
+      inter.object = this;
+      inter.dist = dist;
+      inter.part = i;
 
-		}		
-
-    }	
-}    		
+      }
+  }
+  }
+  else{
+    if(Intersect_Triangle(ray,part,dist)){
+      inter.object = this;
+      inter.dist = dist;
+      inter.part = part;
+      }
+  }
     
     return inter;
 }
@@ -100,24 +93,30 @@ vec3 Mesh::Normal(const vec3& point, int part) const
 // two triangles.
 bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
 {
-    TODO;
+ 
     vec3 A = vertices[triangles[tri][0]];
     vec3 B = vertices[triangles[tri][1]];
     vec3 C = vertices[triangles[tri][2]];
     vec3 norm = cross( (B-A), (C-A));
     norm = norm.normalized();
-    double t;
-    if(dot(ray.direction,norm) != 0){
-	t = dot(A-ray.endpoint,norm) / (dot(ray.direction,norm));
-	std::cout << "Distance: " << t << std::endl;
-	if(t > small_t){
-		vec3 p = ray.Point(t);
-		std::cout << "X: " <<norm[0] << "Y: " << norm[1] << "Z: " << norm[2] << std::endl;
-		double area = .5* cross((B-A),(C-A)).magnitude();
-		vec3 temp = cross( (B-A), (C-A));
-		std::cout << temp[0] << " " << temp[1] << " " << temp[2] << std::endl;
-		double area_a = .5*dot( cross((B-p),(C-p)),norm);
-		double area_b = .5*dot( cross((p-A),(C-A)),norm);
+    double t = (dot( (B-ray.endpoint),norm))/ dot(ray.direction,norm);
+    // std::cout << t << std::endl;
+    if(t > small_t){
+      vec3 p = ray.Point(t);
+      double area = 0.5*dot(cross( (B-A), (C-A)),norm);
+      double area_a = 0.5*dot(cross( (B-p), (C-p)),norm);
+      double area_b = 0.5*dot(cross( (p-A), (C-A)),norm);
+      double area_c = 0.5*dot(cross( (B-A), (p-A)),norm);
+      double alpha = area_a/area; 
+      double beta = area_b/area;
+      double gamma = area_c/area;
+      // std::cout<< alpha << " " << beta << " " << gamma << std::endl;
+      if(alpha > -1.0*weight_tolerance && beta > -1.0 * weight_tolerance && gamma > -1.0 * weight_tolerance){
+	dist = t;
+	return true;
+      }
+    }
+
     return false;
 }
 
