@@ -43,15 +43,47 @@ void Mesh::Read_Obj(const char* file)
 Hit Mesh::Intersection(const Ray& ray, int part) const
 {
     TODO;
-    return {};
+    Hit inter;
+    double dist = 0;
+    if(part >= 0){
+	if(Intersect_Triangle(ray,part,dist)){
+		inter.object = this;
+		inter.part = part;
+		inter.dist = dist;	
+	}
+	else{
+		inter.object = nullptr;
+	}
+
+    }
+    else{
+	for(unsigned i = 0 ; i < triangles.size(); i++){
+		if(Intersect_Triangle(ray,part,dist)){
+		  inter.object = this;
+                  inter.part = part;
+                  inter.dist = dist;
+		}
+		else{
+			inter.object = nullptr;
+
+		}		
+
+    }	
+}    		
+    
+    return inter;
 }
 
 // Compute the normal direction for the triangle with index part.
 vec3 Mesh::Normal(const vec3& point, int part) const
 {
     assert(part>=0);
-    TODO;
-    return vec3();
+    vec3 A = vertices[triangles[part][0]];
+    vec3 B = vertices[triangles[part][1]];
+    vec3 C = vertices[triangles[part][2]];
+    vec3 norm = cross( (B-A), (C-A));
+    norm = norm.normalized();
+    return norm;
 }
 
 // This is a helper routine whose purpose is to simplify the implementation
@@ -69,6 +101,23 @@ vec3 Mesh::Normal(const vec3& point, int part) const
 bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
 {
     TODO;
+    vec3 A = vertices[triangles[tri][0]];
+    vec3 B = vertices[triangles[tri][1]];
+    vec3 C = vertices[triangles[tri][2]];
+    vec3 norm = cross( (B-A), (C-A));
+    norm = norm.normalized();
+    double t;
+    if(dot(ray.direction,norm) != 0){
+	t = dot(A-ray.endpoint,norm) / (dot(ray.direction,norm));
+	std::cout << "Distance: " << t << std::endl;
+	if(t > small_t){
+		vec3 p = ray.Point(t);
+		std::cout << "X: " <<norm[0] << "Y: " << norm[1] << "Z: " << norm[2] << std::endl;
+		double area = .5* cross((B-A),(C-A)).magnitude();
+		vec3 temp = cross( (B-A), (C-A));
+		std::cout << temp[0] << " " << temp[1] << " " << temp[2] << std::endl;
+		double area_a = .5*dot( cross((B-p),(C-p)),norm);
+		double area_b = .5*dot( cross((p-A),(C-A)),norm);
     return false;
 }
 
