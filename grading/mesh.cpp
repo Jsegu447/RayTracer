@@ -49,25 +49,14 @@ Hit Mesh::Intersection(const Ray& ray, int part) const
   inter.dist = std::numeric_limits<double>::max();
   inter.part = -1;
 
-  if(part >=0){
-	   if(Intersect_Triangle(ray,part,dist)){
-		     inter.object = this;
-		       inter.part = part;
-		       inter.dist = dist;
-		           return inter;
-	 }
-
-  }
- else{
   for(unsigned i = 0; i < triangles.size(); i++){
-    if(Intersect_Triangle(ray,i,dist) && inter.dist > dist){ //CHECK FOR CLOSEST INTER 
+    if(Intersect_Triangle(ray,i,dist) && inter.dist > dist){ //CHECK FOR CLOSEST INTER
       inter.object = this;
       inter.dist = dist;
       inter.part = i;
 
       }
   }
-}
 
 
     return inter;
