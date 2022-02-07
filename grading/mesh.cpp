@@ -46,24 +46,30 @@ Hit Mesh::Intersection(const Ray& ray, int part) const
   double dist = 0;
   Hit inter;
   inter.object = nullptr;
-  if(part < 0){
+  inter.dist = std::numeric_limits<double>::max();
+  inter.part = -1;
+
+  if(part >=0){
+	   if(Intersect_Triangle(ray,part,dist)){
+		     inter.object = this;
+		       inter.part = part;
+		       inter.dist = dist;
+		           return inter;
+	 }
+
+  }
+ else{
   for(unsigned i = 0; i < triangles.size(); i++){
-    if(Intersect_Triangle(ray,i,dist)){
+    if(Intersect_Triangle(ray,i,dist) && inter.dist > dist){ //CHECK FOR CLOSEST INTER 
       inter.object = this;
       inter.dist = dist;
       inter.part = i;
 
       }
   }
-  }
-  else{
-    if(Intersect_Triangle(ray,part,dist)){
-      inter.object = this;
-      inter.dist = dist;
-      inter.part = part;
-      }
-  }
-    
+}
+
+
     return inter;
 }
 
@@ -93,7 +99,7 @@ vec3 Mesh::Normal(const vec3& point, int part) const
 // two triangles.
 bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
 {
- 
+
     vec3 A = vertices[triangles[tri][0]];
     vec3 B = vertices[triangles[tri][1]];
     vec3 C = vertices[triangles[tri][2]];
@@ -107,7 +113,7 @@ bool Mesh::Intersect_Triangle(const Ray& ray, int tri, double& dist) const
       double area_a = 0.5*dot(cross( (B-p), (C-p)),norm);
       double area_b = 0.5*dot(cross( (p-A), (C-A)),norm);
       double area_c = 0.5*dot(cross( (B-A), (p-A)),norm);
-      double alpha = area_a/area; 
+      double alpha = area_a/area;
       double beta = area_b/area;
       double gamma = area_c/area;
       // std::cout<< alpha << " " << beta << " " << gamma << std::endl;
